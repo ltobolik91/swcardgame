@@ -5,7 +5,6 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
-import { SWApiService } from '../services/sw-api-service';
 import { FormControl } from '@angular/forms';
 import { BehaviorSubject, Observable, filter, map, switchMap, tap } from 'rxjs';
 import _ from 'lodash';
@@ -13,6 +12,7 @@ import { Player } from './models/player.model';
 import { DropdownOption } from './models/dropdown.model';
 import { SWFetchedData } from './models/card-data.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { BoardService } from './board.service';
 
 @Component({
   selector: 'sw-board',
@@ -49,6 +49,7 @@ export class BoardComponent implements OnInit {
   private p2WonLabel = 'P2 Won!';
   private drawLabel = 'Draw !';
   private destroyRef = inject(DestroyRef);
+  private fetchedData$ = this.boardService.fetchedData$;
 
   private isLoadingSubject$: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
@@ -60,27 +61,27 @@ export class BoardComponent implements OnInit {
   public isLoading$: Observable<boolean> =
     this.isLoadingSubject$.asObservable();
 
-  constructor(private readonly swApiService: SWApiService) {}
+  constructor(private readonly boardService: BoardService) {}
 
   ngOnInit(): void {
     this.selectedType.valueChanges
       .pipe(
-        filter((newType) => newType !== null),
-        map((newType) => newType as string),
-        filter((newType) => !this.fetchedData?.hasOwnProperty(newType)),
+        filter((newCategory) => newCategory !== null),
+        map((newCategory) => newCategory as string),
+        filter((newCategory) => !this.fetchedData?.hasOwnProperty(newCategory)),
         tap(() => this.isLoadingSubject$.next(true)),
-        switchMap((newType) => this.swApiService.fetchAllData(newType)),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((newData) => {
-        const newType = this.selectedType.value as string;
-        this.fetchedData = {
-          ...this.fetchedData,
-          [newType]: newData,
-        } as SWFetchedData;
+      .subscribe((newCategory) => {
+        this.boardService.getSWData(newCategory);
         this.isLoadingSubject$.next(false);
       });
-
+    this.fetchedData$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((newFetchedData) => {
+        this.fetchedData = newFetchedData;
+        this.isLoadingSubject$.next(false);
+      });
     this.selectedType.setValue(this.categories[0].value);
   }
 

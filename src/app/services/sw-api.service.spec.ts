@@ -3,7 +3,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { SWApiService } from './sw-api-service';
+import { SWApiService } from './sw-api.service';
 
 describe('SWApiService', () => {
   let service: SWApiService;
