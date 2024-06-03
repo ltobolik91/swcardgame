@@ -1,0 +1,7 @@
+<mat-card *ngIf="dataEntries.length > 0" class="sw-card">
+    @for (entry of dataEntries; track entry) {
+        @if (entry['value']) {
+            <mat-card-content class="sw-card__entry">{{entry['key']}}: {{entry['value']}}</mat-card-content>
+        }
+    }
+<mat-card>

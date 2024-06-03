@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  width: 400px;
+}
+
+.sw-card {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 16px;
+  background-color: black;
+  border: 1px solid yellow;
+
+  &__entry {
+    text-wrap: nowrap;
+    overflow: hidden;
+    width: 370px;
+    text-overflow: ellipsis;
+  }
+}

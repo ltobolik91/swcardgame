@@ -1,0 +1,40 @@
+<div>
+  <div class="header">
+    <h1>Star Wars Card Game</h1>
+  </div>
+  <div class="header">
+    <h1>{{result$ | async}}</h1>
+  </div>
+  <div class="battleground">
+    <sw-card [cardData]="p1.card" [class.is-winner]="p1.currentWinner"></sw-card>
+    <div class="battleground__control-panel">
+      <div class="players-panel">
+        <div>
+          <h2>P1</h2>
+          <h3>Wins: {{p1.wins}}</h3>
+          <h3>Streak: {{p1.streak}}</h3>
+        </div>
+        <div>
+          <h2>P2</h2>
+          <h3>Wins: {{p2.wins}}</h3>
+          <h3>Streak: {{p2.streak}}</h3>
+        </div>
+      </div>
+      <mat-form-field>
+          <mat-label>Cards type</mat-label>
+          <mat-select ngDefaultControl [formControl]="selectedType">
+            @for (type of cardType; track type) {
+              <mat-option [value]="type.value">{{type.viewValue}}</mat-option>
+            }
+          </mat-select>
+      </mat-form-field>
+      @if ( isLoading$ |async) {
+        <mat-spinner [diameter]="40" ></mat-spinner>
+      }
+      @else {
+        <button  mat-flat-button color="primary" (click)="roll()">Roll</button>
+      }
+    </div>
+    <sw-card [cardData]="p2.card" [class.is-winner]="p2.currentWinner"></sw-card>
+  </div>
+</div>
