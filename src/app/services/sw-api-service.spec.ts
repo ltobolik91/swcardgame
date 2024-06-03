@@ -1,4 +1,7 @@
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { SWApiService } from './sw-api-service';
 
@@ -36,7 +39,7 @@ describe('SWApiService', () => {
     };
 
     const type = 'people';
-    service.fetchAllData(type).subscribe((data: string | any[]) => {
+    service.fetchAllData(type).subscribe((data: string | object[]) => {
       expect(data.length).toBe(3);
       expect(data).toEqual(mockResponse.results);
     });
@@ -53,7 +56,7 @@ describe('SWApiService', () => {
       previous: null,
       results: [{ name: 'Tatooine', url: 'something', edited: 'something' }],
     };
-  
+
     const type = 'planets';
     service.fetchAllData(type).subscribe((data) => {
       expect(data.length).toBe(1);
@@ -61,7 +64,7 @@ describe('SWApiService', () => {
       expect(data[0].hasOwnProperty('url')).toBeFalse();
       expect(data[0].hasOwnProperty('edited')).toBeFalse();
     });
-  
+
     const req = httpMock.expectOne(`https://swapi.dev/api/${type}`);
     expect(req.request.method).toBe('GET');
     req.flush(mockResponse);
@@ -92,16 +95,16 @@ describe('SWApiService', () => {
       previous: null,
       results: [{ name: 'Luke Skywalker', height: '172', gender: 'male' }],
     };
-  
+
     const mockResponse2 = {
       count: 2,
       next: null,
       previous: 'https://swapi.dev/api/people/?page=1',
       results: [{ name: 'Leia Organa', height: '150', gender: 'female' }],
     };
-  
+
     const type = 'people';
-  
+
     service['fetchPage'](`${service['url']}${type}`, []).subscribe((data) => {
       // Sprawdź, czy dane zostały poprawnie pobrane
       expect(data.length).toBe(2);
@@ -110,12 +113,12 @@ describe('SWApiService', () => {
         { name: 'Leia Organa', height: '150', gender: 'female' },
       ]);
     });
-  
+
     // Oczekujemy na jedno zapytanie HTTP za każdym razem, gdy funkcja fetchPage jest wywoływana
     const req1 = httpMock.expectOne(`https://swapi.dev/api/${type}`);
     expect(req1.request.method).toBe('GET');
     req1.flush(mockResponse1);
-  
+
     const req2 = httpMock.expectOne('https://swapi.dev/api/people/?page=2');
     expect(req2.request.method).toBe('GET');
     req2.flush(mockResponse2);

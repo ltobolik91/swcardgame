@@ -1,5 +1,8 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule, provideClientHydration } from '@angular/platform-browser';
+import {
+  BrowserModule,
+  provideClientHydration,
+} from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { BoardComponent } from './board/board.component';
@@ -13,10 +16,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
-  declarations: [
-    BoardComponent,
-    CardComponent
-  ],
+  declarations: [BoardComponent, CardComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -28,10 +28,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     ReactiveFormsModule,
     FormsModule,
   ],
-  providers: [
-    provideClientHydration(),
-    provideAnimationsAsync()
-  ],
-  bootstrap: [BoardComponent]
+  providers: [provideClientHydration(), provideAnimationsAsync()],
+  bootstrap: [BoardComponent],
 })
-export class AppModule { }
+export class AppModule {}
