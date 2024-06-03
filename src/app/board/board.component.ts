@@ -1,14 +1,12 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit } from '@angular/core';
 import { SWApiService } from '../services/sw-api-service';
 import { FormControl } from '@angular/forms';
-import { BehaviorSubject, Observable, filter, switchMap, take, tap } from 'rxjs';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { BehaviorSubject, Observable, filter, switchMap, tap } from 'rxjs';
 import _ from 'lodash';
 import { Player } from './models/player.model';
 import { DropdownOption } from './models/dropdown.model';
 import { SWFetchedData } from './models/card-data.model';
 
-@UntilDestroy()
 @Component({
   selector: 'sw-board',
   templateUrl: './board.component.html',
@@ -39,7 +37,10 @@ export class BoardComponent implements OnInit{
   private resultSubject$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   public result$: Observable<string> = this.resultSubject$.asObservable();
 
-  constructor(private readonly swApiService: SWApiService) {}
+  constructor(
+    private readonly swApiService: SWApiService,
+    private destroyRef: DestroyRef
+  ) {}
 
   ngOnInit(): void {
     this.selectedType.valueChanges
@@ -47,7 +48,7 @@ export class BoardComponent implements OnInit{
         filter((newType)=> !this.fetchedData.hasOwnProperty(newType as string)),
         tap(()=> this.isLoadingSubject$.next(true)),
         switchMap((newType)=>this.swApiService.fetchAllData(newType as string)),
-        untilDestroyed(this)
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((newData)=> {
         const newType = this.selectedType.value as string
@@ -109,5 +110,9 @@ export class BoardComponent implements OnInit{
       this.resultSubject$.next(this.drawLabel);
     }
   }
+}
+
+function takeUntilDestroyed(destroyRef: DestroyRef): import("rxjs").OperatorFunction<object[], unknown> {
+  throw new Error('Function not implemented.');
 }
 

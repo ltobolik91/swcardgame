@@ -1,0 +1,76 @@
+{
+  "root": true,
+  "ignorePatterns": ["projects/**/*"],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "parserOptions": {
+        "project": ["tsconfig.json", "e2e/tsconfig.json"],
+        "createDefaultProgram": true
+      },
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@angular-eslint/recommended",
+        "plugin:@angular-eslint/template/process-inline-templates"
+      ],
+      "rules": {
+        "@typescript-eslint/no-inferrable-types": "off",
+        "@typescript-eslint/ban-types": "warn",
+        "@typescript-eslint/no-this-alias": "warn",
+        "@typescript-eslint/no-empty-function": "warn",
+        "@angular-eslint/no-host-metadata-property": "off",
+        "@angular-eslint/no-output-native": "warn",
+        "@angular-eslint/no-input-rename": "warn",
+        "@angular-eslint/no-output-on-prefix": "warn",
+        "@angular-eslint/directive-selector": "warn",
+        "@angular-eslint/directive-class-suffix": "warn",
+        "@angular-eslint/component-class-suffix": "warn",
+        "@typescript-eslint/no-empty-interface": "warn",
+        "@typescript-eslint/adjacent-overload-signatures": "warn",
+        "@typescript-eslint/consistent-type-definitions": "warn",
+        "@typescript-eslint/no-var-requires": "warn",
+        "@typescript-eslint/dot-notation": "off",
+        "@typescript-eslint/ban-ts-comment": "warn",
+        "@typescript-eslint/explicit-member-accessibility": [
+          "off",
+          {
+            "accessibility": "explicit"
+          }
+        ],
+        "@typescript-eslint/no-unused-expressions": [
+          "warn",
+          {
+            "allowShortCircuit": true
+          }
+        ],
+        "arrow-parens": ["off", "always"],
+        "brace-style": ["warn", "1tbs"],
+        "guard-for-in": "off",
+        "id-blacklist": "off",
+        "id-match": "off",
+        "import/order": "off",
+        "jsdoc/no-types": "off",
+        "no-underscore-dangle": "off",
+        "no-var": "warn",
+        "no-useless-catch": "warn",
+        "no-extra-boolean-cast": "warn",
+        "no-useless-escape": "warn",
+        "no-prototype-builtins": "off",
+        "no-empty": "warn",
+        "no-case-declarations": "warn",
+        "prefer-rest-params": "warn",
+        "prefer-spread": "off",
+        "prefer-const": "warn"
+      }
+    },
+    {
+      "files": ["*.html"],
+      "extends": ["plugin:@angular-eslint/template/recommended"],
+      "rules": {
+        "@angular-eslint/template/eqeqeq": "warn",
+        "@angular-eslint/template/no-negated-async": "warn"
+      }
+    }
+  ]
+}

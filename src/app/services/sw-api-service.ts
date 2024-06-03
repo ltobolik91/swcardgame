@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable, map, mergeMap, of, tap } from "rxjs";
+import { Observable, map, mergeMap, of } from "rxjs";
 import { omit } from "lodash";
 
 interface SwPageDTO<T> {
@@ -26,10 +26,10 @@ export class SWApiService {
     )
   }
 
-   private fetchPage<T>(url: string, accumulatedData: any[]): Observable<T[]> {
+   private fetchPage<T>(url: string, accumulatedData: T[]): Observable<T[]> {
     return this.httpClient.get<SwPageDTO<T[]>>(url).pipe(
         mergeMap(response => {
-            accumulatedData = accumulatedData.concat(response.results);
+            accumulatedData = accumulatedData.concat(response.results as T);
             if (response.next) {
             return this.fetchPage(response.next, accumulatedData);
             } else {
