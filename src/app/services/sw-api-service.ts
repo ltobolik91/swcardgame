@@ -1,10 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable, map, mergeMap, of, tap } from "rxjs";
-import { CardData } from "../board/board.component";
 import { omit } from "lodash";
 
-interface swPageDTO<T> {
+interface SwPageDTO<T> {
     count: number,
     next: string,
     previous: string | null,
@@ -28,7 +27,7 @@ export class SWApiService {
   }
 
    private fetchPage<T>(url: string, accumulatedData: any[]): Observable<T[]> {
-    return this.httpClient.get<swPageDTO<T[]>>(url).pipe(
+    return this.httpClient.get<SwPageDTO<T[]>>(url).pipe(
         mergeMap(response => {
             accumulatedData = accumulatedData.concat(response.results);
             if (response.next) {
