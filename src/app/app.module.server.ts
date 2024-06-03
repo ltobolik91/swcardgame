@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { ServerModule } from '@angular/platform-server';
 
 import { AppModule } from './app.module';
-import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { BoardComponent } from './board/board.component';
 
@@ -12,6 +11,6 @@ import { BoardComponent } from './board/board.component';
     ServerModule,
     HttpClientModule,
   ],
-  bootstrap: [AppComponent],
+  bootstrap: [BoardComponent],
 })
 export class AppServerModule {}

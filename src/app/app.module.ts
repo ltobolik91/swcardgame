@@ -15,7 +15,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
-    AppComponent,
     BoardComponent,
     CardComponent
   ],
@@ -34,6 +33,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     provideClientHydration(),
     provideAnimationsAsync()
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [BoardComponent]
 })
 export class AppModule { }

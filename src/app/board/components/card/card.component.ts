@@ -1,11 +1,7 @@
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
-import { CardData } from '../../board.component';
+import { CardData, CardEntries } from '../../models/card-data.model';
 
-interface CardEntries {
-    key: string;
-    value: string | string[]
-}
 @Component({
     selector: 'sw-card',
     templateUrl: './card.component.html',

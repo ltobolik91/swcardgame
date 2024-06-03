@@ -1,43 +1,13 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { SWApiService } from '../services/sw-api-service';
-import { FormControl, UntypedFormControl, Validators } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { BehaviorSubject, Observable, filter, switchMap, take, tap } from 'rxjs';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import _ from 'lodash';
+import { Player } from './models/player.model';
+import { DropdownOption } from './models/dropdown.model';
+import { SWFetchedData } from './models/card-data.model';
 
-interface SWFetchedData {
-  [key: string]: CardData<string>[];
-}
-export interface CardData<T> {
-  [key: string]: T;
-}
-
-interface DropdownOption<T> {
-  value: T;
-  viewValue: string;
-  determinesWinningProperty: string;
-}
-
-export class Player {
-  wins: number = 0;
-  streak: number = 0;
-  card: CardData<string> = {};
-  currentWinner: boolean = false;
-
-  setCard(newCard:CardData<string>): void{
-    this.card = newCard;
-  }
-
-  playerWon(): void {
-    this.wins +=1;
-    this.streak +=1;
-    this.currentWinner = true;
-  }
-  playerLose(): void {
-    this.streak = 0;
-    this.currentWinner = false;
-  }
-}
 @UntilDestroy()
 @Component({
   selector: 'sw-board',
