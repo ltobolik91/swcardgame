@@ -23,7 +23,7 @@
       <mat-form-field>
           <mat-label>Cards type</mat-label>
           <mat-select ngDefaultControl [formControl]="selectedType">
-            @for (type of cardType; track type) {
+            @for (type of categories; track type) {
               <mat-option [value]="type.value">{{type.viewValue}}</mat-option>
             }
           </mat-select>

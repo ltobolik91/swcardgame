@@ -1,11 +1,18 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { SWApiService } from '../services/sw-api-service';
 import { FormControl } from '@angular/forms';
-import { BehaviorSubject, Observable, filter, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, filter, map, switchMap, tap } from 'rxjs';
 import _ from 'lodash';
 import { Player } from './models/player.model';
 import { DropdownOption } from './models/dropdown.model';
 import { SWFetchedData } from './models/card-data.model';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'sw-board',
@@ -14,7 +21,7 @@ import { SWFetchedData } from './models/card-data.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardComponent implements OnInit {
-  cardType: DropdownOption<string>[] = [
+  public categories: DropdownOption<string>[] = [
     { value: 'people', viewValue: 'People', determinesWinningProperty: 'mass' },
     {
       value: 'starships',
@@ -41,29 +48,29 @@ export class BoardComponent implements OnInit {
   private p1WonLabel = 'P1 Won!';
   private p2WonLabel = 'P2 Won!';
   private drawLabel = 'Draw !';
+  private destroyRef = inject(DestroyRef);
 
   private isLoadingSubject$: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
-  public isLoading$: Observable<boolean> =
-    this.isLoadingSubject$.asObservable();
-
   private resultSubject$: BehaviorSubject<string> = new BehaviorSubject<string>(
     '',
   );
+
   public result$: Observable<string> = this.resultSubject$.asObservable();
+  public isLoading$: Observable<boolean> =
+    this.isLoadingSubject$.asObservable();
 
   constructor(private readonly swApiService: SWApiService) {}
 
   ngOnInit(): void {
     this.selectedType.valueChanges
       .pipe(
-        filter(
-          (newType) => !this.fetchedData.hasOwnProperty(newType as string),
-        ),
+        filter((newType) => newType !== null),
+        map((newType) => newType as string),
+        filter((newType) => !this.fetchedData?.hasOwnProperty(newType)),
         tap(() => this.isLoadingSubject$.next(true)),
-        switchMap((newType) =>
-          this.swApiService.fetchAllData(newType as string),
-        ),
+        switchMap((newType) => this.swApiService.fetchAllData(newType)),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((newData) => {
         const newType = this.selectedType.value as string;
@@ -74,57 +81,66 @@ export class BoardComponent implements OnInit {
         this.isLoadingSubject$.next(false);
       });
 
-    this.selectedType.setValue(this.cardType[0].value);
+    this.selectedType.setValue(this.categories[0].value);
   }
 
   public roll(): void {
     const currentUsedType = this.fetchedData[this.selectedType.value as string];
 
-    this.p1.setCard(currentUsedType[_.random(0, currentUsedType.length - 1)]);
-    this.p2.setCard(currentUsedType[_.random(0, currentUsedType.length - 1)]);
+    this.p1.card = currentUsedType[_.random(0, currentUsedType.length - 1)];
+    this.p2.card = currentUsedType[_.random(0, currentUsedType.length - 1)];
+
     this.findWinner();
   }
 
   private findWinner(): void {
     this.resultSubject$.next('');
+
+    // Find the winning property using Lodash's `find` with type safety
     const winningProperty: string | null =
-      this.cardType.find((type) => type.value === this.selectedType.value)
-        ?.determinesWinningProperty || null;
+      _.find(
+        this.categories,
+        (category) => category.value === this.selectedType.value,
+      )?.determinesWinningProperty || null;
 
     if (!winningProperty) {
       return;
     }
 
-    const p1Value = parseInt(this.p1.card[winningProperty] as string);
-    const p2Value = parseInt(this.p2.card[winningProperty] as string);
+    const player1Value = parseInt(this.p1.card[winningProperty] as string);
+    const player2Value = parseInt(this.p2.card[winningProperty] as string);
 
-    //In some cases property has value unknown in this case win card with value
-    if (!isNaN(p1Value) && !isNaN(p2Value)) {
-      if (p1Value > p2Value) {
-        this.p1.playerWon();
-        this.p2.playerLose();
+    // Use Lodash's `isNaN` for type safety and potential null handling
+    const bothValuesValid = !_.isNaN(player1Value) && !_.isNaN(player2Value);
+    const bothValuesUnknown = _.isNaN(player1Value) && _.isNaN(player2Value);
+
+    if (bothValuesValid) {
+      if (player1Value > player2Value) {
+        this.p1.recordWin();
+        this.p2.recordLoss();
         this.resultSubject$.next(this.p1WonLabel);
-      } else if (p2Value > p1Value) {
-        this.p2.playerWon();
-        this.p1.playerLose();
+      } else if (player2Value > player1Value) {
+        this.p2.recordWin();
+        this.p1.recordLoss();
         this.resultSubject$.next(this.p2WonLabel);
       } else {
-        this.p1.playerLose();
-        this.p2.playerLose();
+        this.p1.recordLoss();
+        this.p2.recordLoss();
         this.resultSubject$.next(this.drawLabel);
       }
-    } else if (!isNaN(p1Value)) {
-      this.p1.playerWon();
-      this.p2.playerLose();
-      this.resultSubject$.next(this.p1WonLabel);
-    } else if (!isNaN(p2Value)) {
-      this.p2.playerWon();
-      this.p1.playerLose();
-      this.resultSubject$.next(this.p2WonLabel);
-    } else {
-      this.p1.playerLose();
-      this.p2.playerLose();
+    } else if (bothValuesUnknown) {
+      this.p1.recordLoss();
+      this.p2.recordLoss();
       this.resultSubject$.next(this.drawLabel);
+    } else {
+      // Handle cases where only one value is valid
+      const winner = _.isNaN(player1Value) ? this.p2 : this.p1;
+      winner.recordWin();
+      const loser = winner === this.p1 ? this.p2 : this.p1;
+      loser.recordLoss();
+      this.resultSubject$.next(
+        winner === this.p1 ? this.p1WonLabel : this.p2WonLabel,
+      );
     }
   }
 }

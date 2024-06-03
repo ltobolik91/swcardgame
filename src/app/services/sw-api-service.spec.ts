@@ -105,14 +105,16 @@ describe('SWApiService', () => {
 
     const type = 'people';
 
-    service['fetchPage'](`${service['url']}${type}`, []).subscribe((data) => {
-      // Sprawdź, czy dane zostały poprawnie pobrane
-      expect(data.length).toBe(2);
-      expect(data).toEqual([
-        { name: 'Luke Skywalker', height: '172', gender: 'male' },
-        { name: 'Leia Organa', height: '150', gender: 'female' },
-      ]);
-    });
+    service['fetchPage'](`${service['url']}${type}`, []).subscribe(
+      (data: object[]) => {
+        // Sprawdź, czy dane zostały poprawnie pobrane
+        expect(data.length).toBe(2);
+        expect(data).toEqual([
+          { name: 'Luke Skywalker', height: '172', gender: 'male' },
+          { name: 'Leia Organa', height: '150', gender: 'female' },
+        ]);
+      },
+    );
 
     // Oczekujemy na jedno zapytanie HTTP za każdym razem, gdy funkcja fetchPage jest wywoływana
     const req1 = httpMock.expectOne(`https://swapi.dev/api/${type}`);
