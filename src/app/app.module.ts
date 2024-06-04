@@ -14,12 +14,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { CardComponent } from './board/components/card/card.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [BoardComponent, CardComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    CommonModule,
     HttpClientModule,
     MatCardModule,
     MatSelectModule,

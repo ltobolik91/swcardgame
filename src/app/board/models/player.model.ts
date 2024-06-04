@@ -44,12 +44,4 @@ export class Player {
     this._streak = 0;
     this._currentWinner = false;
   }
-
-  getCurrentStreak(): number {
-    return this._streak;
-  }
-
-  getCurrentWinner(): boolean {
-    return this._currentWinner;
-  }
 }
