@@ -6,7 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { BehaviorSubject, Observable, filter, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, Observable, filter, map } from 'rxjs';
 import _ from 'lodash';
 import { Player } from './models/player.model';
 import { DropdownOption } from './models/dropdown.model';
@@ -62,19 +62,20 @@ export class BoardComponent implements OnInit {
     this.isLoadingSubject$.asObservable();
 
   constructor(private readonly boardService: BoardService) {}
-
+  // Here we are fetching all the data since SW api sometimes return 404
+  // We need to fetch all pages and then we can get random object
+  // To prevent unnecessary api calls we are doing it just once on ini and dropdown value change.
   ngOnInit(): void {
     this.selectedType.valueChanges
       .pipe(
         filter((newCategory) => newCategory !== null),
         map((newCategory) => newCategory as string),
         filter((newCategory) => !this.fetchedData?.hasOwnProperty(newCategory)),
-        tap(() => this.isLoadingSubject$.next(true)),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((newCategory) => {
+        this.isLoadingSubject$.next(true);
         this.boardService.getSWData(newCategory);
-        this.isLoadingSubject$.next(false);
       });
     this.fetchedData$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -87,9 +88,8 @@ export class BoardComponent implements OnInit {
 
   public roll(): void {
     const currentUsedType = this.fetchedData[this.selectedType.value as string];
-
-    this.p1.card = currentUsedType[_.random(0, currentUsedType.length - 1)];
-    this.p2.card = currentUsedType[_.random(0, currentUsedType.length - 1)];
+    this.p1.card = currentUsedType[_.random(0, currentUsedType?.length - 1)];
+    this.p2.card = currentUsedType[_.random(0, currentUsedType?.length - 1)];
 
     this.findWinner();
   }

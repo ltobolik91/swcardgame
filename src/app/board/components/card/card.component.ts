@@ -5,15 +5,19 @@ import {
   OnChanges,
 } from '@angular/core';
 import { CardData, CardEntries } from '../../models/card-data.model';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'sw-card',
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
+  providers: [TitleCasePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardComponent implements OnChanges {
   @Input() cardData: CardData<string> = {};
+
+  constructor(private titleCasePipe: TitleCasePipe) {}
 
   dataEntries: CardEntries[] = [];
 
@@ -27,7 +31,7 @@ export class CardComponent implements OnChanges {
   private mapToTitleCase(input: string): string {
     return input
       .split('_')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word) => this.titleCasePipe.transform(word))
       .join(' ');
   }
 }
